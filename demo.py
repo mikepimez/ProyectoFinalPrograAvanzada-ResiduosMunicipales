@@ -245,7 +245,7 @@ with tipos:
     total_no_dom = df_filtrado["QRESIDUOS_NO_DOM"].sum()
     total        = total_dom + total_no_dom
 
-    fig3, ax3 = plt.subplots(figsize=(7, 7))
+    fig3, ax3 = plt.subplots(figsize=(5, 5))
     ax3.pie(
         [total_dom, total_no_dom],
         labels=["Domiciliarios", "No Domiciliarios"],
