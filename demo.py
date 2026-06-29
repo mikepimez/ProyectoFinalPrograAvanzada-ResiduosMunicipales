@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import seaborn as sns
 
-# Estilo global seaborn
 sns.set_theme(style="whitegrid", palette="muted")
 
-st.set_page_config(page_title="Residuos Municipales Perú", page_icon="🗑️", layout="wide")
+st.set_page_config(page_title="Dashboard de Residuos Municipales", page_icon="♻️", layout="wide")
 
 # ── Datos ────────────────────────────────────────────────────────────────────
 @st.cache_data
@@ -22,6 +21,7 @@ def cargar_datos():
         "APURIMAC": "APURÍMAC", "HUANUCO": "HUÁNUCO",
         "JUNIN": "JUNÍN", "SAN MARTIN": "SAN MARTÍN", "ANCASH": "ÁNCASH"
     })
+    df["PERIODO"] = pd.to_numeric(df["PERIODO"], errors="coerce")
     return df
 
 COORDS = {
@@ -45,45 +45,296 @@ df = cargar_datos()
 # ════════════════════════════════════════════════════════════════════════════
 # TÍTULO
 # ════════════════════════════════════════════════════════════════════════════
-st.title("🗑️ Residuos Municipales en el Perú")
-st.write(
-    "Análisis interactivo de la generación de residuos municipales "
-    "a nivel distrital entre **2014 y 2024**. "
-    "Datos del Portal de Datos Abiertos del Gobierno Peruano."
+st.title("♻️ Dashboard de Residuos Municipales en el Perú")
+st.write("Análisis visual sobre generación de residuos, población y regiones naturales.")
+
+st.subheader("🔎 Filtros del dashboard")
+
+# ── Slider de rango de años ──────────────────────────────────────────────────
+anio_min = int(df["PERIODO"].min())
+anio_max = int(df["PERIODO"].max())
+
+rango_anios = st.slider(
+    "Rango de años",
+    anio_min, anio_max,
+    (anio_min, anio_max)
 )
 
-st.divider()
+df_filtrado = df[
+    (df["PERIODO"] >= rango_anios[0]) &
+    (df["PERIODO"] <= rango_anios[1])
+]
+
+# ── Filtros departamento / provincia / distrito ──────────────────────────────
+col_departamento, col_provincia, col_distrito = st.columns(3)
+
+departamentos = ["Todos"] + sorted(df["DEPARTAMENTO"].dropna().unique())
+with col_departamento:
+    departamento_seleccionado = st.selectbox("Departamento", departamentos)
+
+if departamento_seleccionado != "Todos":
+    df_filtrado = df_filtrado[df_filtrado["DEPARTAMENTO"] == departamento_seleccionado]
+
+provincias = ["Todos"] + sorted(df_filtrado["PROVINCIA"].dropna().unique())
+with col_provincia:
+    provincia_seleccionada = st.selectbox("Provincia", provincias)
+
+if provincia_seleccionada != "Todos":
+    df_filtrado = df_filtrado[df_filtrado["PROVINCIA"] == provincia_seleccionada]
+
+distritos = ["Todos"] + sorted(df_filtrado["DISTRITO"].dropna().unique())
+with col_distrito:
+    distrito_seleccionado = st.selectbox("Distrito", distritos)
+
+if distrito_seleccionado != "Todos":
+    df_filtrado = df_filtrado[df_filtrado["DISTRITO"] == distrito_seleccionado]
+
+st.markdown("---")
 
 # ════════════════════════════════════════════════════════════════════════════
-# SECCIÓN 1 — Evolución temporal (gráfico principal — matplotlib)
+# TABS
 # ════════════════════════════════════════════════════════════════════════════
-st.header("📈 ¿Cómo ha evolucionado la generación de residuos?")
-st.write("Elige un departamento y mira cómo cambió la cantidad de residuos municipales año a año.")
+inicio, evolucion, comparar, tipos, region_tab, gpc_tab, mapa_tab = st.tabs([
+    "🏠 Inicio",
+    "📈 Residuos por año",
+    "🔀 Comparar departamentos",
+    "🏘️ Tipos de residuos",
+    "🌎 Residuos por región",
+    "📊 GPC promedio",
+    "📍 Mapa"
+])
 
-dept_principal = st.selectbox(
-    "Departamento:",
-    options=sorted(df["DEPARTAMENTO"].unique()),
-    index=sorted(df["DEPARTAMENTO"].unique()).index("LIMA")
-)
+# ────────────────────────────────────────────────────────────────────────────
+# TAB 1 — Inicio
+# ────────────────────────────────────────────────────────────────────────────
+with inicio:
+    st.header("🏠 Introducción del proyecto")
+    st.write("""
+    Debido al crecimiento de la población, la expansión urbana y los cambios
+    en los hábitos de consumo, la generación de residuos se ha convertido en una 
+    problemática grave en el Perú. 
+    Cada año, las ciudades producen grandes cantidades de residuos que deben ser 
+    recolectados, transportados y tratados adecuadamente.
+    """)
+    st.write("""
+    Cuando la gestión de residuos no es eficiente, recae en problemas como la
+    contaminación del suelo, acumulación de basura y afectación a la salud pública. 
+    Por ello, analizar estos datos contribuye a una concientización y permite comprender 
+    mejor sobre cómo se distribuyen los residuos según el año, departamento y población.
+    """)
+    st.write("🎯 **Objetivo:** visualizar la generación de residuos municipales mediante gráficos hechos con Matplotlib y Seaborn.")
 
-df_p = (
-    df[df["DEPARTAMENTO"] == dept_principal]
-    .groupby("PERIODO")["QRESIDUOS_MUN"]
-    .sum()
-    .reset_index()
-)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Años analizados", f"{rango_anios[0]} - {rango_anios[1]}")
+    with col2:
+        st.metric("Registros filtrados", len(df_filtrado))
+    with col3:
+        st.metric("Distrito seleccionado", distrito_seleccionado)
 
-fig1, ax1 = plt.subplots(figsize=(10, 4))
-ax1.plot(df_p["PERIODO"], df_p["QRESIDUOS_MUN"], marker="o", linewidth=2.5,
-         color="#2ecc71", markerfacecolor="white", markeredgewidth=2, markersize=7)
-ax1.fill_between(df_p["PERIODO"], df_p["QRESIDUOS_MUN"], alpha=0.15, color="#2ecc71")
-ax1.set_xlabel("Año", fontsize=11)
-ax1.set_ylabel("Cantidad de residuos municipales (ton)", fontsize=11)
-ax1.set_title(f"Evolución de residuos municipales — {dept_principal}", fontsize=13, fontweight="bold")
-ax1.xaxis.set_major_locator(mticker.MultipleLocator(1))
-ax1.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
-plt.tight_layout()
-st.pyplot(fig1)
-plt.close(fig1)
+    st.divider()
+
+    img1, img2, img3 = st.columns(3)
+    with img1:
+        st.image("https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=800&q=80", caption="Reciclaje y residuos")
+    with img2:
+        st.image("https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&w=800&q=80", caption="Gestión ambiental")
+    with img3:
+        st.image("https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=800&q=80", caption="Cuidado del entorno")
+
+    st.divider()
+    st.subheader("📌 Gráficos incluidos")
+    st.write("""
+    - 📈 **Residuos municipales por año:** evolución de residuos en el tiempo.  
+    - 🔀 **Comparar departamentos:** compara varios departamentos en un mismo gráfico.  
+    - 🏘️ **Tipos de residuos:** pie chart de domiciliarios vs no domiciliarios.  
+    - 🌎 **Distribución por región natural:** porcentaje de residuos según región.  
+    - 📊 **GPC doméstico promedio:** residuos generados por persona al día.
+    - 📍 **Mapa:** densidad de residuos por departamento en el Perú.
+    """)
+
+# ────────────────────────────────────────────────────────────────────────────
+# TAB 2 — Residuos por año (matplotlib con área sombreada)
+# ────────────────────────────────────────────────────────────────────────────
+with evolucion:
+    st.header("📈 Residuos municipales por año")
+    st.write("Muestra cómo ha cambiado la cantidad total de residuos municipales a lo largo de los años.")
+
+    residuos_anio = df_filtrado.groupby("PERIODO")["QRESIDUOS_MUN"].sum()
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(residuos_anio.index, residuos_anio.values, marker="o", linewidth=2.5,
+            color="#2ecc71", markerfacecolor="white", markeredgewidth=2, markersize=7)
+    ax.fill_between(residuos_anio.index, residuos_anio.values, alpha=0.15, color="#2ecc71")
+    ax.set_title(f"Residuos municipales por año — {departamento_seleccionado}", fontsize=13, fontweight="bold")
+    ax.set_xlabel("Año", fontsize=11)
+    ax.set_ylabel("Residuos municipales (ton)", fontsize=11)
+    ax.grid(True)
+    ax.xaxis.set_major_locator(mticker.MultipleLocator(1))
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
+    plt.tight_layout()
+    st.pyplot(fig)
+    plt.close(fig)
+
+# ────────────────────────────────────────────────────────────────────────────
+# TAB 3 — Comparar departamentos (seaborn lineplot) — nuevo!
+# ────────────────────────────────────────────────────────────────────────────
+with comparar:
+    st.header("🔀 Comparar departamentos")
+    st.write("Selecciona varios departamentos para comparar su evolución en el mismo gráfico.")
+
+    col_a, col_b = st.columns([1, 3])
+    with col_a:
+        seleccion = st.multiselect(
+            "Departamento(s):",
+            options=sorted(df["DEPARTAMENTO"].unique()),
+            default=["LIMA", "AREQUIPA", "CUSCO"]
+        )
+        variable = st.selectbox(
+            "Variable:",
+            options={
+                "QRESIDUOS_MUN":    "Residuos totales (ton)",
+                "QRESIDUOS_DOM":    "Residuos domiciliarios (ton)",
+                "QRESIDUOS_NO_DOM": "Residuos no domiciliarios (ton)",
+                "GPC_DOM":          "GPC (kg/hab/día)"
+            }
+        )
+
+    etiquetas = {
+        "QRESIDUOS_MUN":    "Residuos totales (ton)",
+        "QRESIDUOS_DOM":    "Residuos domiciliarios (ton)",
+        "QRESIDUOS_NO_DOM": "Residuos no domiciliarios (ton)",
+        "GPC_DOM":          "GPC (kg/hab/día)"
+    }
+
+    with col_b:
+        if seleccion:
+            df_comp = (
+                df[df["DEPARTAMENTO"].isin(seleccion)]
+                .groupby(["PERIODO", "DEPARTAMENTO"])[variable]
+                .sum()
+                .reset_index()
+            )
+            fig2, ax2 = plt.subplots(figsize=(9, 4))
+            sns.lineplot(data=df_comp, x="PERIODO", y=variable,
+                         hue="DEPARTAMENTO", marker="o", ax=ax2, linewidth=2)
+            ax2.set_xlabel("Año", fontsize=11)
+            ax2.set_ylabel(etiquetas[variable], fontsize=11)
+            ax2.set_title(f"{etiquetas[variable]} por departamento", fontsize=13, fontweight="bold")
+            ax2.xaxis.set_major_locator(mticker.MultipleLocator(1))
+            ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
+            ax2.legend(title="Departamento", bbox_to_anchor=(1.01, 1), loc="upper left")
+            plt.tight_layout()
+            st.pyplot(fig2)
+            plt.close(fig2)
+        else:
+            st.info("Selecciona al menos un departamento.")
+
+# ────────────────────────────────────────────────────────────────────────────
+# TAB 4 — Tipos de residuos (pie chart)
+# ────────────────────────────────────────────────────────────────────────────
+with tipos:
+    st.header("🏘️ Residuos domiciliarios y no domiciliarios")
+    st.write("""
+    Este gráfico compara:
+    - **Residuos domiciliarios:** generados en los domicilios a nivel distrital.
+    - **Residuos no domiciliarios:** generados por actividades económicas, institucionales y barrido público.
+    """)
+
+    total_dom    = df_filtrado["QRESIDUOS_DOM"].sum()
+    total_no_dom = df_filtrado["QRESIDUOS_NO_DOM"].sum()
+    total        = total_dom + total_no_dom
+
+    fig3, ax3 = plt.subplots(figsize=(7, 7))
+    ax3.pie(
+        [total_dom, total_no_dom],
+        labels=["Domiciliarios", "No Domiciliarios"],
+        autopct="%.2f%%",
+        startangle=90,
+        colors=["#2ecc71", "#3498db"]
+    )
+    ax3.set_title("Porcentaje de residuos domiciliarios y no domiciliarios", fontsize=13, fontweight="bold")
+    st.pyplot(fig3)
+    plt.close(fig3)
+
+# ────────────────────────────────────────────────────────────────────────────
+# TAB 5 — Región natural (pie chart)
+# ────────────────────────────────────────────────────────────────────────────
+with region_tab:
+    st.header("🌎 Distribución de residuos por región natural")
+    st.write("Muestra qué porcentaje de residuos municipales corresponde a cada región natural.")
+
+    region = df_filtrado.groupby("REG_NAT")["QRESIDUOS_MUN"].sum()
+
+    fig4, ax4 = plt.subplots(figsize=(7, 7))
+    ax4.pie(
+        region.values,
+        labels=region.index,
+        autopct="%.2f%%",
+        startangle=90,
+        colors=sns.color_palette("Set2", len(region))
+    )
+    ax4.set_title("Distribución de residuos por región natural", fontsize=13, fontweight="bold")
+    st.pyplot(fig4)
+    plt.close(fig4)
+
+# ────────────────────────────────────────────────────────────────────────────
+# TAB 6 — GPC (barras horizontales con seaborn)
+# ────────────────────────────────────────────────────────────────────────────
+with gpc_tab:
+    st.header("📊 GPC doméstico promedio")
+    st.write("""
+    Muestra la generación per cápita (GPC) doméstica promedio por departamento.
+    Corresponde a la cantidad de residuos sólidos generados diariamente por habitante (kg/hab/día).
+    """)
+
+    gpc = (
+        df_filtrado.groupby("DEPARTAMENTO")["GPC_DOM"]
+        .mean()
+        .sort_values(ascending=True)
+        .reset_index()
+    )
+
+    fig5, ax5 = plt.subplots(figsize=(9, 6))
+    colores = sns.color_palette("Blues_r", len(gpc))
+    bars = ax5.barh(gpc["DEPARTAMENTO"], gpc["GPC_DOM"], color=colores)
+    ax5.bar_label(bars, fmt="%.3f", padding=3)
+    ax5.set_xlabel("GPC doméstico promedio (kg/hab/día)", fontsize=11)
+    ax5.set_title("Generación per cápita de residuos domiciliarios", fontsize=13, fontweight="bold")
+    plt.tight_layout()
+    st.pyplot(fig5)
+    plt.close(fig5)
+
+# ────────────────────────────────────────────────────────────────────────────
+# TAB 7 — Mapa
+# ────────────────────────────────────────────────────────────────────────────
+with mapa_tab:
+    st.header("📍 ¿Dónde se generan más residuos?")
+    st.write("Mayor densidad de puntos = más residuos en ese departamento.")
+
+    df_mapa = (
+        df_filtrado.groupby("DEPARTAMENTO")["QRESIDUOS_MUN"]
+        .sum().reset_index()
+    )
+    df_mapa["lat"] = df_mapa["DEPARTAMENTO"].map(lambda d: COORDS.get(d, (0, 0))[0])
+    df_mapa["lon"] = df_mapa["DEPARTAMENTO"].map(lambda d: COORDS.get(d, (0, 0))[1])
+    df_mapa = df_mapa[df_mapa["lat"] != 0]
+
+    if not df_mapa.empty:
+        minv, maxv = df_mapa["QRESIDUOS_MUN"].min(), df_mapa["QRESIDUOS_MUN"].max()
+        df_mapa["reps"] = (((df_mapa["QRESIDUOS_MUN"] - minv) / (maxv - minv + 1) * 79 + 1)).astype(int)
+
+        filas = []
+        for _, row in df_mapa.iterrows():
+            for _ in range(row["reps"]):
+                filas.append({
+                    "lat": row["lat"] + np.random.uniform(-0.4, 0.4),
+                    "lon": row["lon"] + np.random.uniform(-0.4, 0.4),
+                })
+        st.map(pd.DataFrame(filas))
+        st.caption("Puntos generados proporcionalmente a los residuos según filtros aplicados.")
+    else:
+        st.info("No hay datos para mostrar en el mapa con los filtros actuales.")
 
 st.divider()
+st.write("📊 Fuente: [Datos Abiertos del Perú](https://www.datosabiertos.gob.pe) · Hecho con **Streamlit**")
