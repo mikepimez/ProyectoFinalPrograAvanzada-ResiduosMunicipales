@@ -94,7 +94,6 @@ st.markdown("---")
 inicio, evolucion, comparar, tipos, region_tab, gpc_tab, mapa_tab = st.tabs([
     "🏠 Inicio",
     "📈 Residuos por año",
-    "🔀 Comparar departamentos",
     "🏘️ Tipos de residuos",
     "🌎 Residuos por región",
     "📊 GPC promedio",
@@ -140,8 +139,7 @@ with inicio:
     st.divider()
     st.subheader("📌 Gráficos de análisis")
     st.write("""
-    - 📈 **Residuos municipales por año:** Evolución de residuos en el tiempo.  
-    - 🔀 **Comparar departamentos:** Comparación de departamentos en un mismo gráfico.  
+    - 📈 **Residuos municipales por año:** Evolución de residuos en el tiempo.    
     - 🏘️ **Tipos de residuos:** Porcentaje de residuos domiciliarios vs no domiciliarios.  
     - 🌎 **Residuos por región natural:** Porcentaje de residuos municipales según región.  
     - 📊 **GPC doméstico promedio:** Generación per cápita de residuos domiciliarios.
@@ -168,8 +166,6 @@ with evolucion:
     plt.tight_layout()
     st.pyplot(fig)
     plt.close(fig)
-
-# Tab3— Comparación de departamentos (seaborn lineplot)
 
 # Tab4-Tipos de residuos
 with tipos:
