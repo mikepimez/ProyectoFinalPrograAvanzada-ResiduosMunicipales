@@ -9,7 +9,7 @@ sns.set_theme(style="whitegrid", palette="muted")
 
 st.set_page_config(page_title="Dashboard de Residuos Municipales", page_icon="♻️", layout="wide")
 
-# ── Datos ────────────────────────────────────────────────────────────────────
+# Datos
 @st.cache_data
 def cargar_datos():
     df = pd.read_csv(
@@ -42,14 +42,13 @@ COORDS = {
 
 df = cargar_datos()
 
-# TÍTULO
-
+# Título
 st.title("♻️ Dashboard de Residuos Municipales en el Perú")
 st.write("Análisis visual sobre generación de residuos, población y regiones naturales.")
 
 st.subheader("🔎 Filtros del dashboard")
 
-# ── Slider de rango de años ──────────────────────────────────────────────────
+# Slider de rangos
 anio_min = int(df["PERIODO"].min())
 anio_max = int(df["PERIODO"].max())
 
@@ -64,7 +63,7 @@ df_filtrado = df[
     (df["PERIODO"] <= rango_anios[1])
 ]
 
-# ── Filtros departamento / provincia / distrito ──────────────────────────────
+# Filtro del Dasboard
 col_departamento, col_provincia, col_distrito = st.columns(3)
 
 departamentos = ["Todos"] + sorted(df["DEPARTAMENTO"].dropna().unique())
@@ -90,8 +89,7 @@ if distrito_seleccionado != "Todos":
 
 st.markdown("---")
 
-# TABS
-
+# Tabs
 inicio, evolucion, comparar, tipos, region_tab, gpc_tab, mapa_tab = st.tabs([
     "🏠 Inicio",
     "📈 Residuos por año",
@@ -102,8 +100,7 @@ inicio, evolucion, comparar, tipos, region_tab, gpc_tab, mapa_tab = st.tabs([
     "📍 Mapa"
 ])
 
-# TAB 1 — Inicio
-
+# Tab1-inicio
 with inicio:
     st.header("🏠 Introducción")
     st.write("""
@@ -150,8 +147,7 @@ with inicio:
     - 📍 **Mapa:** Densidad de residuos por departamento en el Perú.
     """)
 
-# TAB 2 — Residuos por año (matplotlib con área sombreada)
-
+# Tab2-Residuos municipales por año (matplotlib con área sombreada)
 with evolucion:
     st.header("📈 Residuos municipales por año")
     st.write("Muestra cómo ha cambiado la cantidad total de residuos municipales a lo largo de los años.")
@@ -172,8 +168,7 @@ with evolucion:
     st.pyplot(fig)
     plt.close(fig)
 
-# TAB 3 — Comparar departamentos (seaborn lineplot) — nuevo
-
+# Tab3— Comparación de departamentos (seaborn lineplot)
 with comparar:
     st.header("🔀 Comparar departamentos")
     st.write("Selecciona varios departamentos para comparar su evolución en el mismo gráfico.")
@@ -225,8 +220,7 @@ with comparar:
         else:
             st.info("Selecciona al menos un departamento.")
 
-# TAB 4 — Tipos de residuos (pie chart)
-
+# Tab4-Tipos de residuos
 with tipos:
     st.header("🏘️ Residuos domiciliarios y no domiciliarios")
     st.write("""
@@ -251,8 +245,7 @@ with tipos:
     st.pyplot(fig3)
     plt.close(fig3)
 
-# TAB 5 — Región natural (pie chart)
-
+# Tab5- Residuos municipales por región natural
 with region_tab:
     st.header("🌎 Distribución de residuos municipales por región natural")
     st.write("Muestra qué porcentaje de residuos municipales corresponde a cada región natural.")
@@ -271,8 +264,7 @@ with region_tab:
     st.pyplot(fig4)
     plt.close(fig4)
 
-# TAB 6 — GPC (barras horizontales con seaborn)
-
+# Tab6-GPC (barras horizontales con seaborn)
 with gpc_tab:
     st.header("📊 GPC doméstico promedio")
     st.write("""
@@ -297,8 +289,7 @@ with gpc_tab:
     st.pyplot(fig5)
     plt.close(fig5)
 
-# TAB 7 — Mapa
-
+# Tab7- Mapa
 with mapa_tab:
     st.header("📍 ¿Dónde se generan más residuos?")
     st.write("Mayor densidad de puntos = más residuos en ese departamento.")
