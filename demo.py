@@ -91,7 +91,7 @@ if distrito_seleccionado != "Todos":
 st.markdown("---")
 
 # Tabs
-inicio, evolucion, comparar, tipos, region_tab, gpc_tab, mapa_tab = st.tabs([
+inicio, evolucion, tipos, region_tab, gpc_tab, mapa_tab = st.tabs([
     "🏠 Inicio",
     "📈 Residuos por año",
     "🏘️ Tipos de residuos",
