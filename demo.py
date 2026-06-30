@@ -48,7 +48,7 @@ st.write("Análisis visual sobre generación de residuos, población y regiones 
 
 st.subheader("🔎 Filtros del dashboard")
 
-# Slider de rangos
+# filtros 
 anio_min = int(df["PERIODO"].min())
 anio_max = int(df["PERIODO"].max())
 
@@ -63,7 +63,6 @@ df_filtrado = df[
     (df["PERIODO"] <= rango_anios[1])
 ]
 
-# Filtro del Dasboard
 col_departamento, col_provincia, col_distrito = st.columns(3)
 
 departamentos = ["Todos"] + sorted(df["DEPARTAMENTO"].dropna().unique())
