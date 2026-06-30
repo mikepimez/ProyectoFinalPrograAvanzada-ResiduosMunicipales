@@ -170,56 +170,6 @@ with evolucion:
     plt.close(fig)
 
 # Tab3— Comparación de departamentos (seaborn lineplot)
-with comparar:
-    st.header("🔀 Comparar departamentos")
-    st.write("Selecciona varios departamentos para comparar su evolución en el mismo gráfico.")
-
-    col_a, col_b = st.columns([1, 3])
-    with col_a:
-        seleccion = st.multiselect(
-            "Departamento(s):",
-            options=sorted(df["DEPARTAMENTO"].unique()),
-            default=["LIMA", "AREQUIPA", "CUSCO"]
-        )
-        variable = st.selectbox(
-            "Variable:",
-            options={
-                "QRESIDUOS_MUN":    "Residuos totales (ton)",
-                "QRESIDUOS_DOM":    "Residuos domiciliarios (ton)",
-                "QRESIDUOS_NO_DOM": "Residuos no domiciliarios (ton)",
-                "GPC_DOM":          "GPC (kg/hab/día)"
-            }
-        )
-
-    etiquetas = {
-        "QRESIDUOS_MUN":    "Residuos totales (ton)",
-        "QRESIDUOS_DOM":    "Residuos domiciliarios (ton)",
-        "QRESIDUOS_NO_DOM": "Residuos no domiciliarios (ton)",
-        "GPC_DOM":          "GPC (kg/hab/día)"
-    }
-
-    with col_b:
-        if seleccion:
-            df_comp = (
-                df[df["DEPARTAMENTO"].isin(seleccion)]
-                .groupby(["PERIODO", "DEPARTAMENTO"])[variable]
-                .sum()
-                .reset_index()
-            )
-            fig2, ax2 = plt.subplots(figsize=(9, 4))
-            sns.lineplot(data=df_comp, x="PERIODO", y=variable,
-                         hue="DEPARTAMENTO", marker="o", ax=ax2, linewidth=2)
-            ax2.set_xlabel("Año", fontsize=11)
-            ax2.set_ylabel(etiquetas[variable], fontsize=11)
-            ax2.set_title(f"{etiquetas[variable]} por departamento", fontsize=13, fontweight="bold")
-            ax2.xaxis.set_major_locator(mticker.MultipleLocator(1))
-            ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
-            ax2.legend(title="Departamento", bbox_to_anchor=(1.01, 1), loc="upper left")
-            plt.tight_layout()
-            st.pyplot(fig2)
-            plt.close(fig2)
-        else:
-            st.info("Selecciona al menos un departamento.")
 
 # Tab4-Tipos de residuos
 with tipos:
