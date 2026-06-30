@@ -58,9 +58,11 @@ rango_anios = st.slider(
     (anio_min, anio_max)
 )
 
+anio_inicio = rango_anios[0]
+anio_fin = rango_anios[1]
 df_filtrado = df[
-    (df["PERIODO"] >= rango_anios[0]) &
-    (df["PERIODO"] <= rango_anios[1])
+    (df["PERIODO"] >= anio_inicio) &
+    (df["PERIODO"] <= anio_fin)
 ]
 
 col_departamento, col_provincia, col_distrito = st.columns(3)
