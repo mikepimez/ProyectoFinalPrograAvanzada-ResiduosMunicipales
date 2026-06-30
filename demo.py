@@ -153,7 +153,7 @@ with evolucion:
 
     residuos_anio = df_filtrado.groupby("PERIODO")["QRESIDUOS_MUN"].sum()
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(9, 4))
     ax.plot(residuos_anio.index, residuos_anio.values, marker="o", linewidth=2.5,
             color="#2ecc71", markerfacecolor="white", markeredgewidth=2, markersize=7)
     ax.fill_between(residuos_anio.index, residuos_anio.values, alpha=0.15, color="#2ecc71")
@@ -179,7 +179,7 @@ with tipos:
     total_dom = df_filtrado["QRESIDUOS_DOM"].sum()
     total_no_dom = df_filtrado["QRESIDUOS_NO_DOM"].sum()
 
-    fig3, ax3 = plt.subplots(figsize=(5, 5))
+    fig3, ax3 = plt.subplots(figsize=(6, 6))
     ax3.pie(
         [total_dom, total_no_dom],
         labels=["Domiciliarios", "No Domiciliarios"],
@@ -198,7 +198,7 @@ with region_tab:
 
     region = df_filtrado.groupby("REG_NAT")["QRESIDUOS_MUN"].sum()
 
-    fig4, ax4 = plt.subplots(figsize=(7, 7))
+    fig4, ax4 = plt.subplots(figsize=(6, 6))
     ax4.pie(
         region.values,
         labels=region.index,
@@ -225,7 +225,7 @@ with gpc_tab:
         .reset_index()
     )
 
-    fig5, ax5 = plt.subplots(figsize=(9, 6))
+    fig5, ax5 = plt.subplots(figsize=(8, 5))
     colores = sns.color_palette("Blues_r", len(gpc))
     bars = ax5.barh(gpc["DEPARTAMENTO"], gpc["GPC_DOM"], color=colores)
     ax5.bar_label(bars, fmt="%.3f", padding=3)
