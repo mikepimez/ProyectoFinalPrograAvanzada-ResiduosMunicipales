@@ -225,7 +225,7 @@ with gpc_tab:
         .reset_index()
     )
 
-    fig5, ax5 = plt.subplots(figsize=(8, 5))
+    fig5, ax5 = plt.subplots(figsize=(6, 4))
     colores = sns.color_palette("Blues_r", len(gpc))
     bars = ax5.barh(gpc["DEPARTAMENTO"], gpc["GPC_DOM"], color=colores)
     ax5.bar_label(bars, fmt="%.3f", padding=3)
