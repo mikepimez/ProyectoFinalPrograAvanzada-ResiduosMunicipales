@@ -42,9 +42,8 @@ COORDS = {
 
 df = cargar_datos()
 
-# ════════════════════════════════════════════════════════════════════════════
 # TÍTULO
-# ════════════════════════════════════════════════════════════════════════════
+
 st.title("♻️ Dashboard de Residuos Municipales en el Perú")
 st.write("Análisis visual sobre generación de residuos, población y regiones naturales.")
 
@@ -91,9 +90,8 @@ if distrito_seleccionado != "Todos":
 
 st.markdown("---")
 
-# ════════════════════════════════════════════════════════════════════════════
 # TABS
-# ════════════════════════════════════════════════════════════════════════════
+
 inicio, evolucion, comparar, tipos, region_tab, gpc_tab, mapa_tab = st.tabs([
     "🏠 Inicio",
     "📈 Residuos por año",
@@ -104,11 +102,10 @@ inicio, evolucion, comparar, tipos, region_tab, gpc_tab, mapa_tab = st.tabs([
     "📍 Mapa"
 ])
 
-# ────────────────────────────────────────────────────────────────────────────
 # TAB 1 — Inicio
-# ────────────────────────────────────────────────────────────────────────────
+
 with inicio:
-    st.header("🏠 Introducción del proyecto")
+    st.header("🏠 Introducción")
     st.write("""
     Debido al crecimiento de la población, la expansión urbana y los cambios
     en los hábitos de consumo, la generación de residuos se ha convertido en una 
@@ -122,7 +119,7 @@ with inicio:
     Por ello, analizar estos datos contribuye a una concientización y permite comprender 
     mejor sobre cómo se distribuyen los residuos según el año, departamento y población.
     """)
-    st.write("🎯 **Objetivo:** visualizar la generación de residuos municipales mediante gráficos hechos con Matplotlib y Seaborn.")
+    st.write("🎯 **Objetivo:** Visualizar la generación de residuos municipales mediante gráficos hechos con Matplotlib y Seaborn.")
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -140,22 +137,21 @@ with inicio:
     with img2:
         st.image("https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&w=800&q=80", caption="Gestión ambiental")
     with img3:
-        st.image("https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=800&q=80", caption="Cuidado del entorno")
+        st.image("https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=800&q=80", caption="Tipos de residuos")
 
     st.divider()
-    st.subheader("📌 Gráficos incluidos")
+    st.subheader("📌 Gráficos de análisis")
     st.write("""
-    - 📈 **Residuos municipales por año:** evolución de residuos en el tiempo.  
-    - 🔀 **Comparar departamentos:** compara varios departamentos en un mismo gráfico.  
-    - 🏘️ **Tipos de residuos:** pie chart de domiciliarios vs no domiciliarios.  
-    - 🌎 **Distribución por región natural:** porcentaje de residuos según región.  
-    - 📊 **GPC doméstico promedio:** residuos generados por persona al día.
-    - 📍 **Mapa:** densidad de residuos por departamento en el Perú.
+    - 📈 **Residuos municipales por año:** Evolución de residuos en el tiempo.  
+    - 🔀 **Comparar departamentos:** Comparación de departamentos en un mismo gráfico.  
+    - 🏘️ **Tipos de residuos:** Porcentaje de residuos domiciliarios vs no domiciliarios.  
+    - 🌎 **Residuos municipales por región natural:** Porcentaje de residuos municipales según región.  
+    - 📊 **GPC doméstico promedio:** Generación per cápita de residuos domiciliarios.
+    - 📍 **Mapa:** Densidad de residuos por departamento en el Perú.
     """)
 
-# ────────────────────────────────────────────────────────────────────────────
 # TAB 2 — Residuos por año (matplotlib con área sombreada)
-# ────────────────────────────────────────────────────────────────────────────
+
 with evolucion:
     st.header("📈 Residuos municipales por año")
     st.write("Muestra cómo ha cambiado la cantidad total de residuos municipales a lo largo de los años.")
@@ -176,9 +172,8 @@ with evolucion:
     st.pyplot(fig)
     plt.close(fig)
 
-# ────────────────────────────────────────────────────────────────────────────
-# TAB 3 — Comparar departamentos (seaborn lineplot) — nuevo!
-# ────────────────────────────────────────────────────────────────────────────
+# TAB 3 — Comparar departamentos (seaborn lineplot) — nuevo
+
 with comparar:
     st.header("🔀 Comparar departamentos")
     st.write("Selecciona varios departamentos para comparar su evolución en el mismo gráfico.")
@@ -230,9 +225,8 @@ with comparar:
         else:
             st.info("Selecciona al menos un departamento.")
 
-# ────────────────────────────────────────────────────────────────────────────
 # TAB 4 — Tipos de residuos (pie chart)
-# ────────────────────────────────────────────────────────────────────────────
+
 with tipos:
     st.header("🏘️ Residuos domiciliarios y no domiciliarios")
     st.write("""
@@ -257,11 +251,10 @@ with tipos:
     st.pyplot(fig3)
     plt.close(fig3)
 
-# ────────────────────────────────────────────────────────────────────────────
 # TAB 5 — Región natural (pie chart)
-# ────────────────────────────────────────────────────────────────────────────
+
 with region_tab:
-    st.header("🌎 Distribución de residuos por región natural")
+    st.header("🌎 Distribución de residuos municipales por región natural")
     st.write("Muestra qué porcentaje de residuos municipales corresponde a cada región natural.")
 
     region = df_filtrado.groupby("REG_NAT")["QRESIDUOS_MUN"].sum()
@@ -278,9 +271,8 @@ with region_tab:
     st.pyplot(fig4)
     plt.close(fig4)
 
-# ────────────────────────────────────────────────────────────────────────────
 # TAB 6 — GPC (barras horizontales con seaborn)
-# ────────────────────────────────────────────────────────────────────────────
+
 with gpc_tab:
     st.header("📊 GPC doméstico promedio")
     st.write("""
@@ -305,9 +297,8 @@ with gpc_tab:
     st.pyplot(fig5)
     plt.close(fig5)
 
-# ────────────────────────────────────────────────────────────────────────────
 # TAB 7 — Mapa
-# ────────────────────────────────────────────────────────────────────────────
+
 with mapa_tab:
     st.header("📍 ¿Dónde se generan más residuos?")
     st.write("Mayor densidad de puntos = más residuos en ese departamento.")
