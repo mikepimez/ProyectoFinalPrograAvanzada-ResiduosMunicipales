@@ -142,7 +142,7 @@ with inicio:
     - 📈 **Residuos municipales por año:** Evolución de residuos en el tiempo.  
     - 🔀 **Comparar departamentos:** Comparación de departamentos en un mismo gráfico.  
     - 🏘️ **Tipos de residuos:** Porcentaje de residuos domiciliarios vs no domiciliarios.  
-    - 🌎 **Residuos municipales por región natural:** Porcentaje de residuos municipales según región.  
+    - 🌎 **Residuos por región natural:** Porcentaje de residuos municipales según región.  
     - 📊 **GPC doméstico promedio:** Generación per cápita de residuos domiciliarios.
     - 📍 **Mapa:** Densidad de residuos por departamento en el Perú.
     """)
@@ -222,16 +222,16 @@ with comparar:
 
 # Tab4-Tipos de residuos
 with tipos:
-    st.header("🏘️ Residuos domiciliarios y no domiciliarios")
+    st.header("🏘️ Residuos Domiciliarios vs no Domiciliarios")
     st.write("""
     Este gráfico compara:
     - **Residuos domiciliarios:** generados en los domicilios a nivel distrital.
-    - **Residuos no domiciliarios:** generados por actividades económicas, institucionales y barrido público.
+    - **Residuos no domiciliarios:** generados por las actividades económicas e institucionales y limpieza de espacios públicos, a nivel distrital.
     """)
 
-    total_dom    = df_filtrado["QRESIDUOS_DOM"].sum()
+    total_dom = df_filtrado["QRESIDUOS_DOM"].sum()
     total_no_dom = df_filtrado["QRESIDUOS_NO_DOM"].sum()
-    total        = total_dom + total_no_dom
+    total = total_dom + total_no_dom
 
     fig3, ax3 = plt.subplots(figsize=(5, 5))
     ax3.pie(
